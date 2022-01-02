@@ -1,0 +1,23 @@
+﻿@page
+@model Azure1News.Pages.AppConfigInfoModel
+@{
+    Layout = null; 
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Azure1News - AppConfigInfo</title>
+    <style>
+        body {
+            font-family: "Segoe UI",Roboto,"Helvetica Neue",Arial,"sans-serif";
+        }
+    </style>
+</head>
+<body>
+    <h1>Azure1News - AppConfigInfo</h1>
+    @Html.Raw(Model.strAppConfigInfoHtml)
+    <hr />
+    <a href="/">Home</a>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html style="background-color:#191919;" lang="en">
+<head>
+    <partial name="~/Pages/Shared/_GoogleTracking.cshtml" />
+
+    <script>
+        if (("; " + document.cookie).split("; " + "ColorScheme" + "=").pop().split(";").shift() === "light") {
+            document.getElementsByTagName('HTML')[0].style.backgroundColor = "white";
+        }
+    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Azure 1 Developer News</title>
+    <meta name="description" content="Azure. Cloud for all.  Turn your ideas into solutions faster using a trusted cloud that's designed for you.">
+    <meta name="keywords" content="Azure, Cloud, Microsoft, DevOps, AppDev, HTML,CSS,XML,JavaScript">
+    <meta name="author" content="email:mark.harrison 'at' microsoft.com">
+    <meta http-equiv="Content-Language" content="EN">
+    <link rel="canonical" href="https://news.azure1.dev/" />
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+          integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/css/site.min.css?rel=4f5227de91" />
+
+</head>
+<body class="preload">
+    <div id="idModal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="idModalTitle">Title</h5>
+                    <button id="idModalClose" type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <div class="modal-body" id="idModalBody">
+                    Body
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="idLightbox" class="modal" tabindex="-1">
+        <div class="modal-dialog ">
+            <div class="modal-content lightbox">
+                <button type="button" class="close lightbox-close" data-dismiss="modal"><span>&times;</span></button>
+                <div class="lightbox-body" id="idLightboxBody">
+                </div>
+            </div>
+        </div>
+    </div>
+    <header class="header sticky">
+        <div class="container-fluid">
+            <div class="row ">
+            </div>
+        </div>
+    </header>
+    <div id="idNavButton" class="hamburger hamburger--arrow" onclick="toggleNav();">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </div>
+    <div id="idSiteTitle">
+        <h1>Azure&nbsp;1&nbsp;Developer&nbsp;News</h1>
+    </div>
+    <div id="idMainContent">
+        @RenderBody()
+    </div>
+    <div id="idNavSidebar" class="sidenav">
+        <br />
+        <div id="idNavSidebarContent">
+            <p>
+                Powered&nbsp;by&nbsp;Azure&nbsp;<i class='icon-white_az-azure iconfa30xp'></i>
+            </p>
+            <p>Provided "as is" with no warranties, and confer no rights.</p>
+            <p>Mark&nbsp;Harrison</p>
+            <br /><br />
+            <p>
+                <span class="iconsidebar" onclick="doInfo();">
+                    <i class='icon-white_fa-info iconfa20xp'></i>About
+                </span>
+            </p>
+            <p>
+                <span class="iconsidebar" onclick="doConfig();">
+                    <i class='icon-white_fa-cogs iconfa20xp'></i>Config
+                </span>
+            </p>
+            <p>
+                <span class="iconsidebar" onclick="window.open('https://twitter.com/azure1dev','_blank');">
+                    <i class='icon-white_fa-twitter iconfa20xp'></i>Twitter
+                </span>
+            </p>
+            <p>
+                <span class="iconsidebar" onclick="window.open('https://feeds.feedburner.com/azure1dev','_blank');">
+                    <i class='icon-white_fa-rss iconfa20xp'></i>RSS&nbsp;Feed
+                </span>
+            </p>
+            <p>
+                <span class="iconsidebar" onclick="window.open('https://www.azure1.dev','_blank');">
+                    <i class='icon-white_fa-website iconfa20xp'></i>Azure&nbsp;1
+                </span>
+            </p>
+            <br />
+
+
+        </div>
+    </div>
+
+    <div id="idNavOverlay" onclick="toggleNav();"></div>
+
+    <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js"
+            integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+
+    <script src="/js/site.min.js?rel=cf687713d4"></script>
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

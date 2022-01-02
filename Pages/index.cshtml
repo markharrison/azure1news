@@ -1,0 +1,18 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Azure 1 News";
+}
+<div id="idPage" style="display:none;">
+    <br />
+    @Html.Raw(Model.strHTML)
+</div>
+
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            doIndexReady();
+        });
+    </script>
+}

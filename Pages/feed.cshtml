@@ -1,0 +1,9 @@
+﻿@page
+<?xml version="1.0" encoding="UTF-8"?>
+@model Azure1News.Pages.FeedModel
+@{
+    Layout = null;
+    Response.ContentType = "application/xml";
+    Response.StatusCode = 200;
+}
+@Html.Raw( Model.strFeed )

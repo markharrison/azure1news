@@ -1,0 +1,20 @@
+﻿@page
+@model Azure1News.Pages.EchoModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Echo</title>
+    <style>
+        .echodata{
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    @Html.Raw(Model.strHTML)
+</body>
+</html>

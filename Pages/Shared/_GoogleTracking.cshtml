@@ -1,0 +1,8 @@
+﻿@inject AppConfig appconfig
+@Html.Raw($"<script async src=\"https://www.googletagmanager.com/gtag/js?id={appconfig.GoogleId}\"></script>")
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    @Html.Raw($"gtag('config', '{appconfig.GoogleId}');") 
+</script>
