@@ -54,27 +54,6 @@ namespace Azure1News.Pages
 
         private  void doPage()
         {
-
-            //string strHost = HttpContext.Request.Host.ToString();
-            //string strIPAddress = HttpContext.Connection.LocalIpAddress.ToString();
-            //string strBase = "/";
-            //string strOrigUri = HttpContext.Request.Headers["x-original-uri"].ToString();
-            //if (strOrigUri.Length > 0)
-            //{
-            //    if (!strOrigUri.EndsWith("/"))
-            //    {
-            //        strOrigUri += "/";
-            //    }
-            //    strBase = strOrigUri;
-            //}
-
-            ////if ((strHost.Contains("localhost")) && (!strIPAddress.Contains("127.0.0.1")))
-            //if (strHost.Contains("localhost"))
-            //{
-            //    strHost = "localhost:" + HttpContext.Connection.LocalPort.ToString(); // Needed cause of container NAT
-            //}
-            //string RSSFeedURL = "http://" + strHost + strBase + "feed";
-
             string RSSFeedURL = "https://feeds.feedburner.com/azure1dev";
 
             char[] escape = { ' ', '\r', '\n', '\t' };
@@ -214,8 +193,6 @@ namespace Azure1News.Pages
             _strHTMLImages += "</div></div>";
 
         }
-
-
 
         public void OnGet()
         {
