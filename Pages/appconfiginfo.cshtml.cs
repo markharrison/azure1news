@@ -29,6 +29,7 @@ namespace Azure1News.Pages
 
             strAppConfigInfoHtml += "OS Description: " + System.Runtime.InteropServices.RuntimeInformation.OSDescription + "<br/>";
             strAppConfigInfoHtml += "ASPNETCORE_ENVIRONMENT: " + _config.GetValue<string>("ASPNETCORE_ENVIRONMENT") + "<br/>";
+            strAppConfigInfoHtml += "Framework Description: " + System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription + "<br/>";   
             strAppConfigInfoHtml += "Instrumentation Key: " + _config.GetValue<string>("ApplicationInsights:InstrumentationKey") + "<br/>";
             strAppConfigInfoHtml += "Build Identifier: " + _config.GetValue<string>("BuildIdentifier") + "<br/>";
             strAppConfigInfoHtml += "Feed Url: " + _appconfig.FeedUrl + "<br/>";
