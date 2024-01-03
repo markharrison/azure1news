@@ -19,13 +19,32 @@
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+            }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = (context) =>
+                {
+                    var headers = context.Context.Response.GetTypedHeaders();
+                    headers.CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+                    {
+                        Public = true,
+                        MaxAge = TimeSpan.FromDays(1)
+                    };
+                }
+            });
+
+            app.UseResponseCaching();
 
             app.UseRouting();
-
-            app.UseAuthorization();
 
             app.MapRazorPages();
 
