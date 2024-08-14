@@ -34,6 +34,11 @@ namespace Azure1News.Pages
             strAppConfigInfoHtml += "Build Identifier: " + _config.GetValue<string>("BuildIdentifier") + "<br/>";
             strAppConfigInfoHtml += "Feed Url: " + _appconfig.FeedUrl + "<br/>";
             strAppConfigInfoHtml += "Google Id: " + _appconfig.GoogleId + "<br/>";
+            strAppConfigInfoHtml += "ConsumerKey: " + _appconfig.ConsumerKey + "<br/>";
+            strAppConfigInfoHtml += "ConsumerSecret: " + _appconfig.ConsumerSecret + "<br/>";
+            strAppConfigInfoHtml += "AccessToken: " + _appconfig.AccessToken + "<br/>";
+            strAppConfigInfoHtml += "AccessTokenSecret: " + _appconfig.AccessTokenSecret + "<br/>";
+
         }
     }
 }

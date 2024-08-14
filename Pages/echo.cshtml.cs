@@ -14,7 +14,7 @@ namespace Azure1News.Pages
     public class EchoModel : PageModel
     {
 
-        public string strHTML;
+        public string? strHTML;
 
         public async Task OnGetAsync()
         {

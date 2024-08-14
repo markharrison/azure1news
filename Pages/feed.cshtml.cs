@@ -19,16 +19,15 @@ namespace Azure1News.Pages
         private IWebHostEnvironment _env;
         AppConfig _appconfig;
         private readonly IMemoryCache _MemoryCache;
-        public string strFeed;
+        public string? strFeed = "";
+        private readonly IHttpClientFactory _httpClientFactory;
 
-
-        static readonly HttpClient client = new HttpClient();
-
-        public FeedModel(IWebHostEnvironment env, IMemoryCache MemoryCache, AppConfig appconfig)
-        {
+        public FeedModel(IWebHostEnvironment env, IMemoryCache MemoryCache, AppConfig appconfig, IHttpClientFactory httpClientFactory)
+            {
             _env = env;
             _appconfig = appconfig;
             _MemoryCache = MemoryCache;
+            _httpClientFactory = httpClientFactory;
         }
 
         private string getPubDate()
@@ -42,7 +41,8 @@ namespace Azure1News.Pages
         {
             try
             {
-                HttpResponseMessage response = await client.GetAsync(_appconfig.FeedUrl);
+                var httpClient = _httpClientFactory.CreateClient();
+                HttpResponseMessage response = await httpClient.GetAsync(_appconfig.FeedUrl);
                 response.EnsureSuccessStatusCode();
                 strFeed = await response.Content.ReadAsStringAsync();
 
@@ -94,8 +94,8 @@ namespace Azure1News.Pages
         }
 
         public async Task OnGetAsync()
-        {        
-            
+        {      
+                     
             if (_MemoryCache.TryGetValue("Feed", out strFeed))
             {
                 return;

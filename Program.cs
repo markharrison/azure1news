@@ -6,6 +6,7 @@
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddHttpClient();
             builder.Services.AddRazorPages();
             builder.Services.AddMemoryCache();
             builder.Services.AddSingleton<AppConfig>(new AppConfig(builder.Configuration));

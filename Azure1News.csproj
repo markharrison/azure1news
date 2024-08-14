@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <UserSecretsId>7eed5652-3b31-4c57-9459-9a483b0143cf</UserSecretsId>
@@ -11,7 +12,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	<PackageReference Include="HtmlAgilityPack" Version="1.11.62" />
+	<PackageReference Include="OAuth.DotNetCore" Version="3.0.1" />
   </ItemGroup>
 
 </Project>
