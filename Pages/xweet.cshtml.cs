@@ -24,68 +24,68 @@ namespace Azure1News.Pages
             _httpClientFactory = httpClientFactory;
         }
 
-        async Task<string?> GetTwitterImageFromUrl(string url)
-        {
-            try
-            {
-                var httpClient = _httpClientFactory.CreateClient();
-                string htmlContent = await httpClient.GetStringAsync(url);
+        //async Task<string?> GetTwitterImageFromUrl(string url)
+        //{
+        //    try
+        //    {
+        //        var httpClient = _httpClientFactory.CreateClient();
+        //        string htmlContent = await httpClient.GetStringAsync(url);
 
-                var htmlDoc = new HtmlDocument();
-                htmlDoc.LoadHtml(htmlContent);
+        //        var htmlDoc = new HtmlDocument();
+        //        htmlDoc.LoadHtml(htmlContent);
 
-                var twitterImageMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='twitter:image']");
-                if (twitterImageMetaTag != null)
-                {
-                    return twitterImageMetaTag.GetAttributeValue("content", null);
-                }
+        //        var twitterImageMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='twitter:image']");
+        //        if (twitterImageMetaTag != null)
+        //        {
+        //            return twitterImageMetaTag.GetAttributeValue("content", null);
+        //        }
 
-                var twitterImageSrcMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='twitter:image:src']");
-                if (twitterImageSrcMetaTag != null)
-                {
-                    return twitterImageSrcMetaTag.GetAttributeValue("content", null);
-                }
+        //        var twitterImageSrcMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='twitter:image:src']");
+        //        if (twitterImageSrcMetaTag != null)
+        //        {
+        //            return twitterImageSrcMetaTag.GetAttributeValue("content", null);
+        //        }
 
-                var ogImageMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:image']");
-                if (ogImageMetaTag != null)
-                {
-                    return ogImageMetaTag.GetAttributeValue("content", null);
-                }
+        //        var ogImageMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:image']");
+        //        if (ogImageMetaTag != null)
+        //        {
+        //            return ogImageMetaTag.GetAttributeValue("content", null);
+        //        }
 
-                var ogImageSecureUrlMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:image:secure_url']");
-                if (ogImageSecureUrlMetaTag != null)
-                {
-                    return ogImageSecureUrlMetaTag.GetAttributeValue("content", null);
-                }
+        //        var ogImageSecureUrlMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:image:secure_url']");
+        //        if (ogImageSecureUrlMetaTag != null)
+        //        {
+        //            return ogImageSecureUrlMetaTag.GetAttributeValue("content", null);
+        //        }
 
-                var ogImageUrlMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:image:url']");
-                if (ogImageUrlMetaTag != null)
-                {
-                    return ogImageUrlMetaTag.GetAttributeValue("content", null);
-                }
+        //        var ogImageUrlMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:image:url']");
+        //        if (ogImageUrlMetaTag != null)
+        //        {
+        //            return ogImageUrlMetaTag.GetAttributeValue("content", null);
+        //        }
 
-                var linkImageSrcTag = htmlDoc.DocumentNode.SelectSingleNode("//link[@rel='image_src']");
-                if (linkImageSrcTag != null)
-                {
-                    return linkImageSrcTag.GetAttributeValue("href", null);
-                }
+        //        var linkImageSrcTag = htmlDoc.DocumentNode.SelectSingleNode("//link[@rel='image_src']");
+        //        if (linkImageSrcTag != null)
+        //        {
+        //            return linkImageSrcTag.GetAttributeValue("href", null);
+        //        }
 
-                var thumbnailMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='thumbnail']");
-                if (thumbnailMetaTag != null)
-                {
-                    return thumbnailMetaTag.GetAttributeValue("content", null);
-                }
+        //        var thumbnailMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='thumbnail']");
+        //        if (thumbnailMetaTag != null)
+        //        {
+        //            return thumbnailMetaTag.GetAttributeValue("content", null);
+        //        }
 
-            }
-            catch (Exception ex)
-            {
-                string errText = $"Error getting image {ex.Message}";
-                Console.WriteLine(errText);
-                return errText;
-            }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        string errText = $"Error getting image {ex.Message}";
+        //        Console.WriteLine(errText);
+        //        return errText;
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
 
 
         async Task<string> PostXweet(string tweetText, string? imagePath = null)
@@ -98,64 +98,64 @@ namespace Azure1News.Pages
 
             try
             {
-                if (!string.IsNullOrEmpty(imagePath))
-                {
+                //if (!string.IsNullOrEmpty(imagePath))
+                //{
 
-                    byte[] imageData;
+                //    byte[] imageData;
 
-                    if (Uri.IsWellFormedUriString(imagePath, UriKind.Absolute))
-                    {
-                        var httpClient1 = _httpClientFactory.CreateClient();
-                        imageData = await httpClient1.GetByteArrayAsync(imagePath);
+                //    if (Uri.IsWellFormedUriString(imagePath, UriKind.Absolute))
+                //    {
+                //        var httpClient1 = _httpClientFactory.CreateClient();
+                //        imageData = await httpClient1.GetByteArrayAsync(imagePath);
 
-                    }
-                    else
-                    {
-                        return "Error Image Url";
-                    }
+                //    }
+                //    else
+                //    {
+                //        return "Error Image Url";
+                //    }
 
-                    var content = new MultipartFormDataContent();
-                    var imageContent = new ByteArrayContent(imageData);
-                    imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpeg");
-                    content.Add(imageContent, "media");
+                //    var content = new MultipartFormDataContent();
+                //    var imageContent = new ByteArrayContent(imageData);
+                //    imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpeg");
+                //    content.Add(imageContent, "media");
 
-                    OAuthRequest oAuthRequestUpload =
-                            OAuthRequest.ForProtectedResource("POST", _appconfig.ConsumerKey, _appconfig.ConsumerSecret,
-                                                 _appconfig.AccessToken, _appconfig.AccessTokenSecret);
+                //    OAuthRequest oAuthRequestUpload =
+                //            OAuthRequest.ForProtectedResource("POST", _appconfig.ConsumerKey, _appconfig.ConsumerSecret,
+                //                                 _appconfig.AccessToken, _appconfig.AccessTokenSecret);
 
-                    oAuthRequestUpload.RequestUrl = uploadUrl;
+                //    oAuthRequestUpload.RequestUrl = uploadUrl;
 
-                    string oAuthHeaderValueUpload = oAuthRequestUpload.GetAuthorizationHeader();
+                //    string oAuthHeaderValueUpload = oAuthRequestUpload.GetAuthorizationHeader();
 
-                    var httpClientUpload = _httpClientFactory.CreateClient();
-                    httpClientUpload.DefaultRequestHeaders.Add("Authorization", oAuthHeaderValueUpload);
+                //    var httpClientUpload = _httpClientFactory.CreateClient();
+                //    httpClientUpload.DefaultRequestHeaders.Add("Authorization", oAuthHeaderValueUpload);
 
-                    var uploadResponse = await httpClientUpload.PostAsync(uploadUrl, content);
+                //    var uploadResponse = await httpClientUpload.PostAsync(uploadUrl, content);
 
-                    if (uploadResponse.IsSuccessStatusCode)
-                    {
-                        var uploadJsonResponse = await uploadResponse.Content.ReadAsStringAsync();
+                //    if (uploadResponse.IsSuccessStatusCode)
+                //    {
+                //        var uploadJsonResponse = await uploadResponse.Content.ReadAsStringAsync();
 
-                        using var uploadDoc = JsonDocument.Parse(uploadJsonResponse);
-                        string mediaId = uploadDoc.RootElement.GetProperty("media_id_string").GetString() ?? string.Empty;
+                //        using var uploadDoc = JsonDocument.Parse(uploadJsonResponse);
+                //        string mediaId = uploadDoc.RootElement.GetProperty("media_id_string").GetString() ?? string.Empty;
 
-                        payload = new
-                        {
-                            text = tweetText,
-                            media = new
-                            {
-                                media_ids = new string[] { mediaId }
-                            }
-                        };
+                //        payload = new
+                //        {
+                //            text = tweetText,
+                //            media = new
+                //            {
+                //                media_ids = new string[] { mediaId }
+                //            }
+                //        };
 
-                    }
-                    else
-                    {
-                        string errRsp = $"Error posting media:{uploadResponse.StatusCode}";
-                        Console.WriteLine(errRsp);
-                        return errRsp;
-                    }
-                }
+                //    }
+                //    else
+                //    {
+                //        string errRsp = $"Error posting media:{uploadResponse.StatusCode}";
+                //        Console.WriteLine(errRsp);
+                //        return errRsp;
+                //    }
+                //}
 
                 var tweetContent = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
 
@@ -218,16 +218,19 @@ namespace Azure1News.Pages
 
             if (!string.IsNullOrEmpty(strLink) && !string.IsNullOrEmpty(strTitle))
             {
-                string? strRsp = await GetTwitterImageFromUrl(strLink);
-                if (strRsp == null || strRsp.ToLower().StartsWith("http"))
-                {
-                    tweetText = strTitle + " " + strLink + Environment.NewLine + textTags;
-                    strStatus = await PostXweet(tweetText, strRsp);
-                }
-                else
-                {
-                    strStatus = strRsp;
-                }
+                //string? strRsp = await GetTwitterImageFromUrl(strLink);
+                //if (strRsp == null || strRsp.ToLower().StartsWith("http"))
+                //{
+                //    tweetText = strTitle + " " + strLink + Environment.NewLine + textTags;
+                //    strStatus = await PostXweet(tweetText, strRsp);
+                //}
+                //else
+                //{
+                //    strStatus = strRsp;
+                //}
+
+                tweetText = strTitle + " " + strLink + Environment.NewLine + textTags;
+                strStatus = await PostXweet(tweetText);
 
             }
 
