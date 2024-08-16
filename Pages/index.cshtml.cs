@@ -65,7 +65,6 @@ namespace Azure1News.Pages
             bool isMedia = false;
             string iconClass = "fa-link";
 
-            // Check for media content in Element Extensions
             foreach (SyndicationElementExtension extension in item.ElementExtensions)
             {
                 if (extension.OuterName == "content" && extension.OuterNamespace == "http://search.yahoo.com/mrss/")
@@ -82,7 +81,6 @@ namespace Azure1News.Pages
                 }
             }
 
-            // Check for media content in Links with 'enclosure' relationship
             if (!isMedia)
             {
                 foreach (SyndicationLink link in item.Links)
@@ -96,7 +94,6 @@ namespace Azure1News.Pages
                 }
             }
 
-            // Check for YouTube links in the main link
             if (!isMedia)
             {
                 foreach (SyndicationLink link in item.Links)
@@ -113,55 +110,9 @@ namespace Azure1News.Pages
             return (isMedia, iconClass);
         }
 
-        static bool IsImageUrl(string url)
-        {
-            string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
-            return imageExtensions.Any(ext => url.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
-        }
-
-        static string? ExtractImageUrl(SyndicationItem item)
-        {
-            var imageLink = item.Links.FirstOrDefault(link => link.RelationshipType == "enclosure" && link.MediaType.StartsWith("image"));
-            if (imageLink != null)
-            {
-                return imageLink.Uri.ToString();
-            }
-
-            foreach (var extension in item.ElementExtensions)
-            {
-                if (extension.OuterName == "content" || extension.OuterName == "thumbnail")
-                {
-                    XElement mediaElement = extension.GetObject<XElement>();
-                    string imageUrl = mediaElement.Attribute("url")?.Value ?? string.Empty;
-                    if (IsImageUrl(imageUrl))
-                    {
-                        return imageUrl;
-                    }
-                }
-            }
-
-            string content = item.Summary?.Text ?? item.Content?.ToString() ?? string.Empty;
-            if (!string.IsNullOrEmpty(content))
-            {
-                var match = Regex.Match(content, "<img.+?src=[\"'](.+?)[\"'].*?>", RegexOptions.IgnoreCase);
-                if (match.Success)
-                {
-                    string imageUrl = match.Groups[1].Value;
-                    if (IsImageUrl(imageUrl))
-                    {
-                        return imageUrl;
-                    }
-                }
-            }
-
-            return null;
-        }
-
         private async Task doPage()
         {
-            List<string> imageUrls = new List<string>();
             string RSSFeedURL = _appconfig.FeedUrl;
-              RSSFeedURL = "https://feeds.feedburner.com/WatfordFC";
 
             string rssContent = await getRSS(RSSFeedURL);
 
@@ -206,14 +157,6 @@ namespace Azure1News.Pages
 
                     previousDay = currentDay;
 
-                    if (imageUrls.Count < 6)
-                    {
-                        string? imageUrl = ExtractImageUrl(item);
-                        if (!string.IsNullOrEmpty(imageUrl))
-                        {
-                            imageUrls.Add(imageUrl);
-                        }
-                    }
                 }
 
                 htmlBuilder.Append("<div class='linktablerow'><div class='linktabledaycell'></div><div class='linktableseparatorcell'><hr /></div></div>");
