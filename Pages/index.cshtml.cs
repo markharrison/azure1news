@@ -24,8 +24,6 @@ namespace Azure1News.Pages
         private readonly IMemoryCache _MemoryCache;
 
         public string strHTML = "";
-        private string _strHTMLImages = "";
-        private int _iImgIdx = 0;
         AppConfig _appconfig;
         private readonly IHttpClientFactory _httpClientFactory;
 
@@ -109,6 +107,18 @@ namespace Azure1News.Pages
 
             return (isMedia, iconClass);
         }
+        private string GetCustomField(SyndicationItem item, string fieldName)
+        {
+            foreach (SyndicationElementExtension extension in item.ElementExtensions)
+            {
+                XElement element = extension.GetObject<XElement>();
+                if (element.Name.LocalName == fieldName)
+                {
+                    return element.Value;
+                }
+            }
+            return string.Empty;
+        }
 
         private async Task doPage()
         {
@@ -120,22 +130,31 @@ namespace Azure1News.Pages
             {
                 SyndicationFeed feed = SyndicationFeed.Load(reader);
                 StringBuilder htmlBuilder = new StringBuilder();
-
                 string timeNow = DateTime.Now.ToString("ddd, dd MMM yyyy HH:mm:ss 'GMT'");
-
                 htmlBuilder.Append("<div class='linktable'><div class='linktablebody'>");
                 htmlBuilder.Append("<div class='linktablerow'>");
                 htmlBuilder.Append("<div class='linktabledaycell'></div>");
                 htmlBuilder.Append("<div class='linktableheadercell'><strong>Latest&nbsp;News&nbsp;-&nbsp;" + timeNow + "</strong></div>");
                 htmlBuilder.Append("</div>");
 
+                List<string> imageList = new List<string>();
+
                 string? previousDay = null;
 
+                int imageCount = 0;
                 foreach (SyndicationItem item in feed.Items)
                 {
                     string strTitle = item.Title.Text;
                     string strLink = item.Links[0].Uri.ToString();
                     string currentDay = item.PublishDate.ToString("ddd");
+
+                    if (imageCount < 6) {
+                        string cardimageValue = GetCustomField(item, "cardimage");
+                        if (cardimageValue.StartsWith("http")){
+                            imageCount++;
+                            imageList.Add(cardimageValue);
+                        }
+                    }
 
                     if (previousDay != null && currentDay != previousDay)
                     {
@@ -162,10 +181,30 @@ namespace Azure1News.Pages
                 htmlBuilder.Append("<div class='linktablerow'><div class='linktabledaycell'></div><div class='linktableseparatorcell'><hr /></div></div>");
                 htmlBuilder.Append("</div></div>");
 
-                strHTML = htmlBuilder.ToString();
+                StringBuilder htmlImageBuilder = new StringBuilder();
+
+                htmlImageBuilder.Append("<div class='divimagetable'><div class='linktablerow'>");
+                int maxImages = (imageList.Count <= 3) ? 3 : 6;
+
+                for (int i = 0; i < maxImages; i++)
+                {
+                    if (i == 3)
+                    {
+                        htmlImageBuilder.Append("</div><div class='linktablerow'>");
+                    }
+
+                    string imageUrl = imageList[i];
+                    htmlImageBuilder.Append("<div class='divimagetablecell'>");
+                    if (i < imageList.Count) {
+                        htmlImageBuilder.Append($"<img class='divimage' src='https://images.weserv.nl/?url={imageUrl}&amp;t=squaredown&amp;w=280&amp;h=140' width='232' height='133'>");
+                    }
+                    htmlImageBuilder.Append("</div>");
+                }
+                htmlImageBuilder.Append("</div></div>");
+
+                strHTML = htmlImageBuilder.ToString() + "<br />" + htmlBuilder.ToString();
             }
         }
-
 
 
         public async Task OnGetAsync()
