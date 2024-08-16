@@ -7,6 +7,13 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Caching.Memory;
 using System.Xml;
 using System.Net.Http;
+using System.ServiceModel.Syndication;
+using System.Text;
+using HtmlAgilityPack;
+using Microsoft.VisualBasic;
+using Microsoft.Extensions.Primitives;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace Azure1News.Pages
 {
@@ -18,17 +25,16 @@ namespace Azure1News.Pages
 
         public string strHTML = "";
         private string _strHTMLImages = "";
-        private string _strXML = "";
         private int _iImgIdx = 0;
         AppConfig _appconfig;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        static readonly HttpClient client = new HttpClient();
-
-        public IndexModel(IWebHostEnvironment env, IMemoryCache MemoryCache, AppConfig appconfig)
+        public IndexModel(IWebHostEnvironment env, IMemoryCache MemoryCache, AppConfig appconfig, IHttpClientFactory httpClientFactory)
         {
             _env = env;
             _appconfig = appconfig;
             _MemoryCache = MemoryCache;
+            _httpClientFactory = httpClientFactory;
         }
 
         private async Task<string> getRSS(String uri)
@@ -37,8 +43,8 @@ namespace Azure1News.Pages
 
             try
             {
-
-                HttpResponseMessage response = await client.GetAsync(uri);
+                var httpClient = _httpClientFactory.CreateClient();
+                HttpResponseMessage response = await httpClient.GetAsync(uri);
                 response.EnsureSuccessStatusCode();
                 _strXML = await response.Content.ReadAsStringAsync();
 
@@ -54,178 +60,172 @@ namespace Azure1News.Pages
 
         }
 
-        private void doPage()
+        private (bool isMedia, string iconClass) IsPlayableMediaContent(SyndicationItem item)
         {
-            string RSSFeedURL = _appconfig.FeedUrl;
+            bool isMedia = false;
+            string iconClass = "fa-link";
 
-            char[] escape = { ' ', '\r', '\n', '\t' };
-
-            Task<string> task = Task.Run(async () => await getRSS(RSSFeedURL));
-            task.Wait();
-            _strXML = task.Result;
-
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(_strXML);
-
-            XmlNode? titleNode = doc.DocumentElement?.SelectSingleNode("/rss/channel/title");
-            if (titleNode != null)
+            // Check for media content in Element Extensions
+            foreach (SyndicationElementExtension extension in item.ElementExtensions)
             {
-                string strFeedTitle = titleNode.InnerText;
-            }
-
-            string pubDate = doc.DocumentElement?.SelectSingleNode("/rss/channel/pubDate")?.InnerText.Replace("+0000", "GMT") ?? "Unknown Date";
-
-            XmlNodeList? itemNodes = doc.DocumentElement?.SelectNodes("/rss/channel/item");
-
-            int iCtr = 1;
-            string strLastDay = "";
-
-            strHTML += "<div class='linktable'><div class='linktablebody'>";
-            strHTML += "<div class='linktablerow'>";
-            strHTML += "<div class='linktabledaycell'></div>";
-            strHTML = strHTML + "<div class='linktableheadercell'><strong>Latest&nbsp;News&nbsp;-&nbsp;" + pubDate + "</strong></div>";
-            strHTML += "</div>";
-
-            _strHTMLImages += "<div>";
-
-            if (itemNodes != null)
-            {
-                foreach (XmlNode itemNode in itemNodes)
+                if (extension.OuterName == "content" && extension.OuterNamespace == "http://search.yahoo.com/mrss/")
                 {
-                    if (iCtr++ > 45) break;
-
-                    strHTML += "<div class='linktablerow'>";
-
-                    try
+                    XElement mediaElement = extension.GetObject<XElement>();
+                    string mediaType = mediaElement.Attribute("type")?.Value ?? string.Empty;
+                    string mediaUrl = mediaElement.Attribute("url")?.Value ?? string.Empty;
+                    if (mediaType.StartsWith("video") || mediaType.StartsWith("audio") || mediaUrl.Contains("youtube.com") || mediaUrl.Contains("youtu.be"))
                     {
-                        string strIcon = "fa-link";
-                        string strMedia = "";
-                        string strMediaType = "";
-
-                        XmlNode? titlexNode = itemNode.SelectSingleNode("title");
-                        string strTitle = titlexNode?.InnerText ?? "No Title";
-
-                        XmlNode? linkNode = itemNode.SelectSingleNode("link");
-                        string strLink = linkNode?.InnerText.Trim(escape) ?? "No Link";
-
-                        XmlNode? pubDateNode = itemNode.SelectSingleNode("pubDate");
-                        string strDay = pubDateNode?.InnerText.Substring(0, 3) ?? "No Date";
-
-                        XmlNamespaceManager ns = new XmlNamespaceManager(doc.NameTable);
-                        ns.AddNamespace("media", "http://search.yahoo.com/mrss/");
-
-                        XmlNode? mediaContentNode = itemNode.SelectSingleNode("media:content", ns);
-                        if (mediaContentNode != null)
-                        {
-                            XmlAttribute? urlAttribute = mediaContentNode.Attributes?["url"];
-                            if (urlAttribute != null)
-                            {
-                                strMedia = urlAttribute.Value;
-                            }
-
-                            XmlAttribute? typeAttribute = mediaContentNode.Attributes?["type"];
-                            if (typeAttribute != null)
-                            {
-                                strMediaType = typeAttribute.Value.ToLower();
-                            }
-                            else
-                            {
-                                XmlAttribute? mediumAttribute = mediaContentNode.Attributes?["medium"];
-                                if (mediumAttribute != null)
-                                {
-                                    strMediaType = mediumAttribute.Value.ToLower();
-                                }
-                            }
-                        }
-                        else
-                        {
-                            XmlNode? enclosureNode = itemNode.SelectSingleNode("enclosure");
-                            if (enclosureNode != null)
-                            {
-                                XmlAttribute? urlAttribute = enclosureNode.Attributes?["url"];
-                                if (urlAttribute != null)
-                                {
-                                    strMedia = urlAttribute.Value;
-                                }
-
-                                XmlAttribute? typeAttribute = enclosureNode.Attributes?["type"];
-                                if (typeAttribute != null)
-                                {
-                                    strMediaType = typeAttribute.Value.ToLower();
-                                }
-                            }
-                        }
-
-                        if (strMedia != "")
-                        {
-                            if (strMediaType == "audio/mpeg" || strMediaType == "video/mp4" || strMediaType == "application/x-shockwave-flash")
-                            {
-                                strIcon = "fa-videoplay";
-                            }
-
-                            if (strMediaType.StartsWith("image"))
-                            {
-                                if (!(strMedia.Contains("gravatar.com")))
-                                {
-                                    if (_iImgIdx < 6)
-                                    {
-                                        _iImgIdx++;
-
-                                        _strHTMLImages += "<div class='azn-itemimagecell'>";
-                                        _strHTMLImages += "<div class='azn-itemimagecontainer'>";
-                                        _strHTMLImages += "<img class='azn-itemimage' src='" + strMedia + "' />";
-                                        _strHTMLImages += "</div>";
-                                        _strHTMLImages += "</div>";
-
-                                        if (_iImgIdx == 3)
-                                        {
-                                            _strHTMLImages += "</div><div class='azn-itemrow'>";
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        strHTML += $"<div class='linktabledaycell'>";
-                        if (strDay != strLastDay)
-                        {
-                            if (strLastDay != "")
-                            {
-                                strHTML += "</div><div class='linktableseparatorcell'><hr /></div></div>";
-                                strHTML += $"<div class='linktablerow'><div class='linktabledaycell'>";
-                            }
-
-                            strHTML += strDay + "&nbsp;:&nbsp";
-                        }
-
-                        strHTML += "</div>";
-                        strLastDay = strDay;
-
-
-                        strHTML += $"<div onclick='window.open(\"{strLink}\", \"_blank\"); return false;' class='linktablearticlecell'>";
-                        strHTML += $"<i class='icon-{strIcon} icon-white_{strIcon} iconfap'></i>" + strTitle;
-                        strHTML += "</div>";
-
+                        isMedia = true;
+                        iconClass = "fa-videoplay"; // Media icon
+                        break;
                     }
-                    catch
-                    {
-                        // do nothing
-                    }
-
-                    strHTML += "</div>";
-
                 }
             }
 
-            strHTML += $"<div class='linktablerow'><div class='linktabledaycell'></div><div class='linktableseparatorcell'><hr /></div></div>";
-            strHTML += "</div></div>";
+            // Check for media content in Links with 'enclosure' relationship
+            if (!isMedia)
+            {
+                foreach (SyndicationLink link in item.Links)
+                {
+                    if (link.RelationshipType == "enclosure" && (link.MediaType.StartsWith("video") || link.MediaType.StartsWith("audio") || link.Uri.ToString().Contains("youtube.com") || link.Uri.ToString().Contains("youtu.be")))
+                    {
+                        isMedia = true;
+                        iconClass = "fa-videoplay"; // Media icon
+                        break;
+                    }
+                }
+            }
 
-            _strHTMLImages += "</div></div>";
+            // Check for YouTube links in the main link
+            if (!isMedia)
+            {
+                foreach (SyndicationLink link in item.Links)
+                {
+                    if (link.Uri.ToString().Contains("youtube.com") || link.Uri.ToString().Contains("youtu.be"))
+                    {
+                        isMedia = true;
+                        iconClass = "fa-videoplay"; // Media icon
+                        break;
+                    }
+                }
+            }
 
-
+            return (isMedia, iconClass);
         }
 
-        public void OnGet()
+        static bool IsImageUrl(string url)
+        {
+            string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
+            return imageExtensions.Any(ext => url.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
+        }
+
+        static string? ExtractImageUrl(SyndicationItem item)
+        {
+            var imageLink = item.Links.FirstOrDefault(link => link.RelationshipType == "enclosure" && link.MediaType.StartsWith("image"));
+            if (imageLink != null)
+            {
+                return imageLink.Uri.ToString();
+            }
+
+            foreach (var extension in item.ElementExtensions)
+            {
+                if (extension.OuterName == "content" || extension.OuterName == "thumbnail")
+                {
+                    XElement mediaElement = extension.GetObject<XElement>();
+                    string imageUrl = mediaElement.Attribute("url")?.Value ?? string.Empty;
+                    if (IsImageUrl(imageUrl))
+                    {
+                        return imageUrl;
+                    }
+                }
+            }
+
+            string content = item.Summary?.Text ?? item.Content?.ToString() ?? string.Empty;
+            if (!string.IsNullOrEmpty(content))
+            {
+                var match = Regex.Match(content, "<img.+?src=[\"'](.+?)[\"'].*?>", RegexOptions.IgnoreCase);
+                if (match.Success)
+                {
+                    string imageUrl = match.Groups[1].Value;
+                    if (IsImageUrl(imageUrl))
+                    {
+                        return imageUrl;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private async Task doPage()
+        {
+            List<string> imageUrls = new List<string>();
+            string RSSFeedURL = _appconfig.FeedUrl;
+              RSSFeedURL = "https://feeds.feedburner.com/WatfordFC";
+
+            string rssContent = await getRSS(RSSFeedURL);
+
+            using (XmlReader reader = XmlReader.Create(new System.IO.StringReader(rssContent)))
+            {
+                SyndicationFeed feed = SyndicationFeed.Load(reader);
+                StringBuilder htmlBuilder = new StringBuilder();
+
+                string timeNow = DateTime.Now.ToString("ddd, dd MMM yyyy HH:mm:ss 'GMT'");
+
+                htmlBuilder.Append("<div class='linktable'><div class='linktablebody'>");
+                htmlBuilder.Append("<div class='linktablerow'>");
+                htmlBuilder.Append("<div class='linktabledaycell'></div>");
+                htmlBuilder.Append("<div class='linktableheadercell'><strong>Latest&nbsp;News&nbsp;-&nbsp;" + timeNow + "</strong></div>");
+                htmlBuilder.Append("</div>");
+
+                string? previousDay = null;
+
+                foreach (SyndicationItem item in feed.Items)
+                {
+                    string strTitle = item.Title.Text;
+                    string strLink = item.Links[0].Uri.ToString();
+                    string currentDay = item.PublishDate.ToString("ddd");
+
+                    if (previousDay != null && currentDay != previousDay)
+                    {
+                        htmlBuilder.Append("<div class='linktablerow'><div class='linktabledaycell'></div><div class='linktableseparatorcell'><hr /></div></div>");
+                    }
+
+                    htmlBuilder.Append("<div class='linktablerow'><div class='linktabledaycell'>");
+                    if (previousDay == null || currentDay != previousDay)
+                    {
+                        htmlBuilder.Append($"{currentDay}:&nbsp;");
+                    }
+                    htmlBuilder.Append("</div>");
+
+                    var (isMedia, strIcon) = IsPlayableMediaContent(item);
+
+                    htmlBuilder.Append($"<div onclick='window.open(\"{strLink}\", \"_blank\"); return false;' class='linktablearticlecell'>");
+                    htmlBuilder.Append($"<i class='icon-{strIcon} icon-white_{strIcon} iconfap'></i>{strTitle}"  );
+                    htmlBuilder.Append("</div></div>");
+
+                    previousDay = currentDay;
+
+                    if (imageUrls.Count < 6)
+                    {
+                        string? imageUrl = ExtractImageUrl(item);
+                        if (!string.IsNullOrEmpty(imageUrl))
+                        {
+                            imageUrls.Add(imageUrl);
+                        }
+                    }
+                }
+
+                htmlBuilder.Append("<div class='linktablerow'><div class='linktabledaycell'></div><div class='linktableseparatorcell'><hr /></div></div>");
+                htmlBuilder.Append("</div></div>");
+
+                strHTML = htmlBuilder.ToString();
+            }
+        }
+
+
+
+        public async Task OnGetAsync()
         {
             strHTML = string.Empty;
             if (_MemoryCache.TryGetValue("Page", out string? cachedHTML))
@@ -234,7 +234,7 @@ namespace Azure1News.Pages
                 return;
             }
 
-            doPage();
+            await doPage();
 
             var options = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(15));
 

@@ -1,16 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using HtmlAgilityPack;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Text;
-using System.Net;
-using System.IO;
-using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Caching.Memory;
-using System.Net.Http;
+using System.Text.RegularExpressions;
 
 namespace Azure1News.Pages
 {
@@ -21,6 +12,7 @@ namespace Azure1News.Pages
         private readonly IMemoryCache _MemoryCache;
         public string? strFeed = "";
         private readonly IHttpClientFactory _httpClientFactory;
+        int imageCount = 0;
 
         public FeedModel(IWebHostEnvironment env, IMemoryCache MemoryCache, AppConfig appconfig, IHttpClientFactory httpClientFactory)
             {
@@ -28,12 +20,102 @@ namespace Azure1News.Pages
             _appconfig = appconfig;
             _MemoryCache = MemoryCache;
             _httpClientFactory = httpClientFactory;
+            imageCount = 0;
         }
 
         private string getPubDate()
         {
             DateTime pubDate = DateTime.UtcNow;
             return pubDate.ToString("ddd',' d MMM yyyy HH':'mm':'ss") + " " + pubDate.ToString("zzzz").Replace(":", "");
+        }
+
+        private string GetCardImage(string link)
+        {
+            try
+            {
+                var httpClient = _httpClientFactory.CreateClient();
+                string htmlContent =  httpClient.GetStringAsync(link).GetAwaiter().GetResult();
+
+                var htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(htmlContent);
+
+                var twitterImageMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='twitter:image']");
+                if (twitterImageMetaTag != null)
+                {
+                    return twitterImageMetaTag.GetAttributeValue("content", null);
+                }
+
+                var twitterImageSrcMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='twitter:image:src']");
+                if (twitterImageSrcMetaTag != null)
+                {
+                    return twitterImageSrcMetaTag.GetAttributeValue("content", null);
+                }
+
+                var ogImageMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:image']");
+                if (ogImageMetaTag != null)
+                {
+                    return ogImageMetaTag.GetAttributeValue("content", null);
+                }
+
+                var ogImageSecureUrlMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:image:secure_url']");
+                if (ogImageSecureUrlMetaTag != null)
+                {
+                    return ogImageSecureUrlMetaTag.GetAttributeValue("content", null);
+                }
+
+                var ogImageUrlMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:image:url']");
+                if (ogImageUrlMetaTag != null)
+                {
+                    return ogImageUrlMetaTag.GetAttributeValue("content", null);
+                }
+
+                var linkImageSrcTag = htmlDoc.DocumentNode.SelectSingleNode("//link[@rel='image_src']");
+                if (linkImageSrcTag != null)
+                {
+                    return linkImageSrcTag.GetAttributeValue("href", null);
+                }
+
+                var thumbnailMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='thumbnail']");
+                if (thumbnailMetaTag != null)
+                {
+                    return thumbnailMetaTag.GetAttributeValue("content", null);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                string errText = $"Error getting image {ex.Message}";
+                Console.WriteLine(errText);
+                return errText;
+            }
+
+            return "Null";
+        }
+
+        private string InsertCardImage(string link)
+        {
+            if (imageCount >= 6)
+            {
+                return "Null";
+            }
+
+            if (_MemoryCache.TryGetValue(link, out string? customValue))
+            {
+                return customValue ?? "Null";
+            }
+
+            customValue = GetCardImage(link);
+            customValue = System.Net.WebUtility.HtmlEncode(customValue);
+
+            _MemoryCache.Set(link, customValue, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromDays(7)));
+
+            if (customValue.StartsWith("http"))
+            {
+                imageCount++;
+            }
+
+
+            return customValue;
         }
 
 
@@ -81,6 +163,18 @@ namespace Azure1News.Pages
                 strFeed = new Regex(pattern, options).Replace(strFeed, "");
                 pattern = @"<description>(.*?)<\/description>";
                 strFeed = new Regex(pattern, options).Replace(strFeed, "");
+
+                imageCount = 0;
+                pattern = @"(<item\b[^>]*>)(.*?)(<\/item>)";
+                strFeed = new Regex(pattern, options).Replace(strFeed, match =>
+                {
+                    string itemContent = match.Groups[2].Value;
+                    string linkPattern = @"<link>(.*?)<\/link>";
+                    string link = new Regex(linkPattern, options).Match(itemContent).Groups[1].Value;
+                    string cardimageValue = InsertCardImage(link);
+                    string cardimageTag = $"<cardimage>{cardimageValue}</cardimage>";
+                    return $"{match.Groups[1].Value}{itemContent}{cardimageTag}{match.Groups[3].Value}";
+                });
 
                 strFeed = Regex.Replace(strFeed, @"^\s*$\n|\r", string.Empty, RegexOptions.Multiline).TrimEnd();
 
