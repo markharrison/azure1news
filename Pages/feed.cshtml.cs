@@ -124,7 +124,7 @@ namespace Azure1News.Pages
             try
             {
                 var httpClient = _httpClientFactory.CreateClient();
-                HttpResponseMessage response = await httpClient.GetAsync(_appconfig.FeedUrl);
+                HttpResponseMessage response = await httpClient.GetAsync(_appconfig.FeedMUrl);
                 response.EnsureSuccessStatusCode();
                 strFeed = await response.Content.ReadAsStringAsync();
 

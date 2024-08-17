@@ -33,6 +33,7 @@ namespace Azure1News.Pages
             strAppConfigInfoHtml += "Instrumentation Key: " + _config.GetValue<string>("ApplicationInsights:InstrumentationKey") + "<br/>";
             strAppConfigInfoHtml += "Build Identifier: " + _config.GetValue<string>("BuildIdentifier") + "<br/>";
             strAppConfigInfoHtml += "Feed Url: " + _appconfig.FeedUrl + "<br/>";
+            strAppConfigInfoHtml += "FeedM Url: " + _appconfig.FeedMUrl + "<br/>";
             strAppConfigInfoHtml += "Google Id: " + _appconfig.GoogleId + "<br/>";
             strAppConfigInfoHtml += "ConsumerKey: " + _appconfig.ConsumerKey + "<br/>";
             strAppConfigInfoHtml += "ConsumerSecret: " + _appconfig.ConsumerSecret + "<br/>";

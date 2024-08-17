@@ -3,6 +3,7 @@
     public class AppConfig
     {
         private string _FeedUrlVal;
+        private string _FeedMUrlVal;
         private string _AdminPWVal;
         private string _GoogleIdVal;
         private string _ConsumerKeyVal;
@@ -13,6 +14,7 @@
         public AppConfig(IConfiguration _config)
         {
             _FeedUrlVal = _config.GetValue<string>("FeedUrl") ?? "";
+            _FeedMUrlVal = _config.GetValue<string>("FeedMUrl") ?? "";
             _AdminPWVal = _config.GetValue<string>("AdminPW") ?? "";
             _GoogleIdVal = _config.GetValue<string>("GoogleId") ?? "";
             _ConsumerKeyVal = _config.GetValue<string>("ConsumerKey") ?? "";
@@ -24,6 +26,11 @@
         {
             get => this._FeedUrlVal;
             set => this._FeedUrlVal = value;
+        }
+        public string FeedMUrl
+        {
+            get => this._FeedMUrlVal;
+            set => this._FeedMUrlVal = value;
         }
         public string AdminPW
         {

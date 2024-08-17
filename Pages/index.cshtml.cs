@@ -50,7 +50,7 @@ namespace Azure1News.Pages
             catch (Exception ex)
             {
 
-                Debug.Write(ex.Message);
+                Console.Write(ex.Message);
                 throw;
             }
 
@@ -148,9 +148,11 @@ namespace Azure1News.Pages
                     string strLink = item.Links[0].Uri.ToString();
                     string currentDay = item.PublishDate.ToString("ddd");
 
-                    if (imageCount < 6) {
+                    if (imageCount < 6)
+                    {
                         string cardimageValue = GetCustomField(item, "cardimage");
-                        if (cardimageValue.StartsWith("http")){
+                        if (cardimageValue.StartsWith("http"))
+                        {
                             imageCount++;
                             imageList.Add(cardimageValue);
                         }
@@ -171,7 +173,7 @@ namespace Azure1News.Pages
                     var (isMedia, strIcon) = IsPlayableMediaContent(item);
 
                     htmlBuilder.Append($"<div onclick='window.open(\"{strLink}\", \"_blank\"); return false;' class='linktablearticlecell'>");
-                    htmlBuilder.Append($"<i class='icon-{strIcon} icon-white_{strIcon} iconfap'></i>{strTitle}"  );
+                    htmlBuilder.Append($"<i class='icon-{strIcon} icon-white_{strIcon} iconfap'></i>{strTitle}");
                     htmlBuilder.Append("</div></div>");
 
                     previousDay = currentDay;
@@ -183,26 +185,33 @@ namespace Azure1News.Pages
 
                 StringBuilder htmlImageBuilder = new StringBuilder();
 
-                htmlImageBuilder.Append("<div class='divimagetable'><div class='linktablerow'>");
-                int maxImages = (imageList.Count <= 3) ? 3 : 6;
-
-                for (int i = 0; i < maxImages; i++)
+                if (imageList.Count > 0)
                 {
-                    if (i == 3)
+                    htmlImageBuilder.Append("<div class='divimagetable'><div class='linktablerow'>");
+                    int maxImages = (imageList.Count <= 3) ? 3 : 6;
+
+                    for (int i = 0; i < maxImages; i++)
                     {
-                        htmlImageBuilder.Append("</div><div class='linktablerow'>");
-                    }
+                        if (i == 3)
+                        {
+                            htmlImageBuilder.Append("</div><div class='linktablerow'>");
+                        }
 
-                    string imageUrl = imageList[i];
-                    htmlImageBuilder.Append("<div class='divimagetablecell'>");
-                    if (i < imageList.Count) {
-                        htmlImageBuilder.Append($"<img class='divimage' src='https://images.weserv.nl/?url={imageUrl}&amp;t=squaredown&amp;w=280&amp;h=140' width='232' height='133'>");
+                        string imageUrl = imageList[i];
+                        htmlImageBuilder.Append("<div class='divimagetablecell'>");
+                        if (i < imageList.Count)
+                        {
+                            htmlImageBuilder.Append($"<img class='divimage' src='https://images.weserv.nl/?url={imageUrl}&amp;t=squaredown&amp;w=280&amp;h=140' width='232' height='133'>");
+                        }
+                        htmlImageBuilder.Append("</div>");
                     }
-                    htmlImageBuilder.Append("</div>");
+                    htmlImageBuilder.Append("</div></div><br />");
+
+                    strHTML += htmlImageBuilder.ToString();
+
                 }
-                htmlImageBuilder.Append("</div></div>");
 
-                strHTML = htmlImageBuilder.ToString() + "<br />" + htmlBuilder.ToString();
+                strHTML += htmlBuilder.ToString();
             }
         }
 
