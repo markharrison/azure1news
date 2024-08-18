@@ -7,68 +7,6 @@ using System.Text.Json;
 
 namespace Azure1News.Pages
 {
-    public class Item
-    {
-        public string Text { get; set; }
-        public DateTime Timestamp { get; set; }
-    }
-
-    public class ItemStorage
-    {
-        private readonly string _filePath;
-
-        public ItemStorage(IWebHostEnvironment env, string fileName)
-        {
-            string dataDirectory = Path.Combine(env.ContentRootPath, "DATA");
-            if (!Directory.Exists(dataDirectory))
-            {
-                Directory.CreateDirectory(dataDirectory);
-            }
-            _filePath = Path.Combine(dataDirectory, fileName);
-        }
-
-        public List<Item> ReadItems()
-        {
-            if (!File.Exists(_filePath))
-            {
-                return new List<Item>();
-            }
-
-            string json = File.ReadAllText(_filePath);
-            return JsonSerializer.Deserialize<List<Item>>(json) ?? new List<Item>();
-        }
-
-        public void WriteItems(List<Item> items)
-        {
-            string json = JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(_filePath, json);
-        }
-    }
-
-
-    public class ItemManager
-    {
-        private readonly ItemStorage _storage;
-
-        public ItemManager(ItemStorage storage)
-        {
-            _storage = storage;
-        }
-
-        public void AddItem(string text)
-        {
-            var items = _storage.ReadItems();
-
-            if (items.Count >= 6)
-            {
-                items = items.OrderBy(i => i.Timestamp).ToList();
-                items.RemoveAt(0); // Remove the oldest item
-            }
-
-            items.Add(new Item { Text = text, Timestamp = DateTime.UtcNow });
-            _storage.WriteItems(items);
-        }
-    }
 
     public class XweetModel : PageModel
     {
