@@ -39,6 +39,12 @@ namespace Azure1News.Pages
                 var htmlDoc = new HtmlDocument();
                 htmlDoc.LoadHtml(htmlContent);
 
+                var ogImageMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:image']");
+                if (ogImageMetaTag != null)
+                {
+                    return ogImageMetaTag.GetAttributeValue("content", null);
+                }
+
                 var twitterImageMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='twitter:image']");
                 if (twitterImageMetaTag != null)
                 {
@@ -49,12 +55,6 @@ namespace Azure1News.Pages
                 if (twitterImageSrcMetaTag != null)
                 {
                     return twitterImageSrcMetaTag.GetAttributeValue("content", null);
-                }
-
-                var ogImageMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:image']");
-                if (ogImageMetaTag != null)
-                {
-                    return ogImageMetaTag.GetAttributeValue("content", null);
                 }
 
                 var ogImageSecureUrlMetaTag = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:image:secure_url']");
@@ -105,7 +105,7 @@ namespace Azure1News.Pages
             }
 
             customValue = GetCardImage(link);
-            customValue = System.Net.WebUtility.HtmlEncode(customValue);
+            customValue = System.Net.WebUtility.UrlEncode(customValue);
 
             _MemoryCache.Set(link, customValue, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromDays(7)));
 
