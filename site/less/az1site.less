@@ -272,27 +272,19 @@ button.close {
 }
 
 .divimagetable {
-    display: table
-}
-
-.divimagetablerow {
-    display: table-row
-}
-
-.divimagetablecell {
-    border: 1px solid #000;
+    display: grid;
+    grid-template-columns: repeat(3, auto); /* Creates 3 columns of auto width */
+    gap: 0; /* No gap between images */
+    width: fit-content; /* Container width fits the content (images) */
+    margin: 0;
     padding: 0;
-    display: table-cell;
-    overflow: hidden
-}
-
-.divimagetablebody {
-    display: table-row-group
+    justify-content: start; /* Aligns the grid to the left */
 }
 
 .divimage {
-    -o-object-fit: cover;
-    object-fit: cover;
-    max-width: 280px;
-    max-height: 160px
+    width: 100%; /* Makes images fill their grid cell */
+    height: auto; /* Maintains aspect ratio */
+    max-width: 280px; /* Maximum width of images */
+    max-height: 140px; /* Maximum height of images */
+    display: block; /* Removes inline spacing */
 }

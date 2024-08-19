@@ -183,29 +183,22 @@ namespace Azure1News.Pages
                 htmlBuilder.Append("<div class='linktablerow'><div class='linktabledaycell'></div><div class='linktableseparatorcell'><hr /></div></div>");
                 htmlBuilder.Append("</div></div>");
 
+
                 StringBuilder htmlImageBuilder = new StringBuilder();
 
                 if (imageList.Count > 0)
                 {
-                    htmlImageBuilder.Append("<div class='divimagetable'><div class='linktablerow'>");
-                    int maxImages = (imageList.Count <= 3) ? 3 : 6;
+                    htmlImageBuilder.Append("<div class='divimagetable'>");
 
-                    for (int i = 0; i < maxImages; i++)
+                    for (int i = 0; i < imageList.Count; i++)
                     {
-                        if (i == 3)
-                        {
-                            htmlImageBuilder.Append("</div><div class='linktablerow'>");
-                        }
-
                         string imageUrl = imageList[i];
-                        htmlImageBuilder.Append("<div class='divimagetablecell'>");
                         if (i < imageList.Count)
                         {
-                            htmlImageBuilder.Append($"<img class='divimage' src='https://images.weserv.nl/?url={imageUrl}&amp;t=squaredown&amp;w=280&amp;h=140' width='232' height='133'>");
+                            htmlImageBuilder.Append($"<img class='divimage' src='https://images.weserv.nl/?url={imageUrl}&amp;t=squaredown&amp;w=280&amp;h=140' >");
                         }
-                        htmlImageBuilder.Append("</div>");
                     }
-                    htmlImageBuilder.Append("</div></div><br />");
+                    htmlImageBuilder.Append("</div><br />");
 
                     strHTML += htmlImageBuilder.ToString();
 
