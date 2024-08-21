@@ -104,7 +104,8 @@ namespace Azure1News.Pages
                 return customValue ?? "Null";
             }
 
-            customValue = GetCardImage(link);
+            customValue = GetCardImage(link);  // /i0.wp.com/
+            customValue = customValue.Replace("/i0.wp.com/", "/");
             customValue = System.Net.WebUtility.UrlEncode(customValue);
 
             _MemoryCache.Set(link, customValue, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromDays(7)));
