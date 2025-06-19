@@ -11,6 +11,7 @@
         private string _AccessTokenVal;
         private string _AccessTokenSecretVal;
         private string[] _RSSFeeds;
+        private string _RSSFeedx;
 
         public AppConfig(IConfiguration _config)
         {
@@ -23,6 +24,7 @@
             _AccessTokenVal = _config.GetValue<string>("AccessToken") ?? "";
             _AccessTokenSecretVal = _config.GetValue<string>("AccessTokenSecret") ?? "";
             _RSSFeeds = _config.GetSection("RssFeeds").Get<string[]>() ?? new string[0];
+            _RSSFeedx = _config.GetValue<string>("RssFeedx") ?? "";
         }
         public string FeedUrl 
         {
@@ -69,6 +71,12 @@
         {
             get => this._RSSFeeds;
             set => this._RSSFeeds = value;
+        }
+
+        public string RSSFeedx
+        {
+            get => this._RSSFeedx;
+            set => this._RSSFeedx = value;
         }
     }
 }
