@@ -168,6 +168,9 @@ namespace Azure1News.Pages
                 strFeed = new Regex(pattern, options).Replace(strFeed, "");
                 pattern = @"<description>(.*?)<\/description>";
                 strFeed = new Regex(pattern, options).Replace(strFeed, "");
+                pattern = @"<wfw:commentRss >(.*?)<\/wfw:commentRss>";
+                strFeed = new Regex(pattern, options).Replace(strFeed, "");
+
 
                 imageCount = 0;
                 pattern = @"(<item\b[^>]*>)(.*?)(<\/item>)";

@@ -14,7 +14,7 @@ namespace Azure1News.Pages
         private List<SyndicationItem> finalItems = new List<SyndicationItem>();
         private string[] feeds;
         private const string CacheKey = "Feedagg";
-        private const int CacheMinutes = 15;
+        private const int CacheMinutes = 60;
         AppConfig _appconfig;
 
         public FeedaggModel(AppConfig appconfig, IMemoryCache cache)
