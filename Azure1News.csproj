@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <UserSecretsId>7eed5652-3b31-4c57-9459-9a483b0143cf</UserSecretsId>
+    <DockerfileContext>.</DockerfileContext>
   </PropertyGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
