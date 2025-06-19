@@ -1,0 +1,8 @@
+﻿@page
+@model Azure1News.Pages.FeedaggModel
+@{
+    Layout = null;
+    Response.ContentType = "application/xml";
+    Response.StatusCode = 200;
+}
+@Html.Raw(Model.strFeed)

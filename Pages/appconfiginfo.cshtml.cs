@@ -39,7 +39,12 @@ namespace Azure1News.Pages
             strAppConfigInfoHtml += "ConsumerSecret: " + _appconfig.ConsumerSecret + "<br/>";
             strAppConfigInfoHtml += "AccessToken: " + _appconfig.AccessToken + "<br/>";
             strAppConfigInfoHtml += "AccessTokenSecret: " + _appconfig.AccessTokenSecret + "<br/>";
-
+            strAppConfigInfoHtml += "RSS Feeds:<br/>";
+            string[] rssFeeds = _appconfig.RSSFeeds;
+            foreach (var feed in rssFeeds)
+            {
+                strAppConfigInfoHtml += "&bull;&nbsp;" + feed + "<br/>";
+            }
         }
     }
 }
