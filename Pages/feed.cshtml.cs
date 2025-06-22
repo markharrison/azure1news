@@ -148,8 +148,8 @@ namespace Azure1News.Pages
                 strFeed = new Regex(pattern, options).Replace(strFeed, "<generator>azure1.dev</generator>");
                 pattern = @"<link>(.*?)<\/link>";
                 strFeed = new Regex(pattern, options).Replace(strFeed, $"<link>https://azure1.dev</link>", 1);
-                pattern = @"<pubDate>(.*?)<\/pubDate>";
-                strFeed = new Regex(pattern, options).Replace(strFeed, $"<pubDate>{getPubDate()}</pubDate>", 1);
+                //pattern = @"<pubDate>(.*?)<\/pubDate>";
+                //strFeed = new Regex(pattern, options).Replace(strFeed, $"<pubDate>{getPubDate()}</pubDate>", 1);
                 pattern = @"<atom:link(.*?)\/>";
                 strFeed = new Regex(pattern, options).Replace(strFeed, "");
                 pattern = @"<content:encoded>(.*?)<\/content:encoded>";
@@ -168,9 +168,6 @@ namespace Azure1News.Pages
                 strFeed = new Regex(pattern, options).Replace(strFeed, "");
                 pattern = @"<description>(.*?)<\/description>";
                 strFeed = new Regex(pattern, options).Replace(strFeed, "");
-                pattern = @"<wfw:commentRss >(.*?)<\/wfw:commentRss>";
-                strFeed = new Regex(pattern, options).Replace(strFeed, "");
-
 
                 imageCount = 0;
                 pattern = @"(<item\b[^>]*>)(.*?)(<\/item>)";

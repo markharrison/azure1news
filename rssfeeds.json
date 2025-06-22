@@ -1,0 +1,45 @@
+{
+  "author": "WNews",
+  "feeds": [
+    {
+      "name": "Microsoft Developer Blogs",
+      "url": "https://devblogs.microsoft.com/feed"
+    },
+    {
+      "name": "Integration blog",
+      "url": "https://techcommunity.microsoft.com/t5/s/gxcuf89792/rss/board?board.id=IntegrationsonAzureBlog"
+    },
+    {
+      "name": "Apps on Azure blog",
+      "url": "https://techcommunity.microsoft.com/t5/s/gxcuf89792/rss/board?board.id=AppsonAzureBlog"
+    },
+    {
+      "name": "MH",
+      "url": "https://raw.githubusercontent.com/markharrison/rssfeed/main/xfeed.xml"
+    },
+    {
+      "name": "Azure Blog",
+      "url": "https://azure.microsoft.com/en-us/blog/feed/"
+    },
+    {
+      "name": "GH Blog",
+      "url": "https://github.blog/feed/"
+    },
+    {
+      "name": "VS Blog",
+      "url": "https://devblogs.microsoft.com/visualstudio/feed/"
+    },
+    {
+      "name": "DotNet blog",
+      "url": "https://devblogs.microsoft.com/dotnet/feed/"
+    },
+    {
+      "name": "AppService Blog",
+      "url": "https://azure.github.io/AppService/"
+    },
+    {
+      "name": "Microsoft Open Source",
+      "url": "https://opensource.microsoft.com/blog/"
+    }
+  ]
+} 

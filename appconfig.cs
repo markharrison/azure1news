@@ -1,4 +1,6 @@
-﻿namespace Azure1News
+﻿using System.Text.Json;
+
+namespace Azure1News
 {
     public class AppConfig
     {
@@ -12,7 +14,6 @@
         private string _AccessTokenSecretVal;
         private string[] _RSSFeeds;
 
-
         public AppConfig(IConfiguration _config)
         {
             _FeedUrlVal = _config.GetValue<string>("FeedUrl") ?? "";
@@ -23,8 +24,42 @@
             _ConsumerSecretVal = _config.GetValue<string>("ConsumerSecret") ?? "";
             _AccessTokenVal = _config.GetValue<string>("AccessToken") ?? "";
             _AccessTokenSecretVal = _config.GetValue<string>("AccessTokenSecret") ?? "";
-            string _RSSFeedx = _config.GetValue<string>("RssFeeds") ?? "";
-            _RSSFeeds = _RSSFeedx.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            try
+            {
+                string json = File.ReadAllText("rssfeeds.json");
+                using JsonDocument document = JsonDocument.Parse(json);
+
+                if (document.RootElement.TryGetProperty("feeds", out JsonElement feedsElement) &&
+                    feedsElement.ValueKind == JsonValueKind.Array)
+                {
+                    List<string> feedUrls = new();
+
+                    foreach (JsonElement feed in feedsElement.EnumerateArray())
+                    {
+                        if (feed.TryGetProperty("url", out JsonElement urlElement) &&
+                            urlElement.ValueKind == JsonValueKind.String)
+                        {
+                            string? url = urlElement.GetString();
+                            if (url != null)
+                            {
+                                feedUrls.Add(url);
+                            }
+                        }
+                    }
+
+                    _RSSFeeds = feedUrls.ToArray();
+                }
+                else
+                {
+                    _RSSFeeds = Array.Empty<string>();
+                }
+            }
+            catch
+            {
+                _RSSFeeds = Array.Empty<string>();
+            }
+
         }
         public string FeedUrl 
         {

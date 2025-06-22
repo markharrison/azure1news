@@ -14,7 +14,7 @@ namespace Azure1News.Pages
         private List<SyndicationItem> finalItems = new List<SyndicationItem>();
         private string[] feeds;
         private const string CacheKey = "Feedagg";
-        private const int CacheMinutes = 60;
+        private const int CacheMinutes = 30;
         AppConfig _appconfig;
 
         public FeedaggModel(AppConfig appconfig, IMemoryCache cache)
@@ -40,11 +40,32 @@ namespace Azure1News.Pages
 
             foreach (string feed in feeds)
             {
-                XmlReader reader = XmlReader.Create(feed);
-                Rss20FeedFormatter formatter = new Rss20FeedFormatter();
-                formatter.ReadFrom(reader);
-                reader.Close();
-                finalItems.AddRange(formatter.Feed.Items);
+                try
+                {
+                    using XmlReader reader = XmlReader.Create(feed);
+                    SyndicationFeed syndicationFeed = SyndicationFeed.Load(reader);
+                    reader.Close();
+
+                    if (syndicationFeed == null) continue;
+
+                    foreach (var item in syndicationFeed.Items)
+                    {
+                        SyndicationItem itemx = new SyndicationItem();
+                        if (item.Links.Count > 0)
+                        {
+                            itemx.Links.Add(item.Links[0]);
+                        }
+                        itemx.Title = item.Title;
+                        itemx.PublishDate = item.PublishDate.ToUniversalTime();
+ //                       itemx.Summary = item.Summary;
+
+                        finalItems.Add(itemx);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message},  Feed: {feed}");
+                }
             }
 
             finalItems.Sort(CompareDates);
@@ -54,11 +75,15 @@ namespace Azure1News.Pages
             }
 
             SyndicationFeed finalFeed = new SyndicationFeed();
-            finalFeed.Title = new TextSyndicationContent("Mark Feed");
-            finalFeed.Copyright = new TextSyndicationContent("Copyright (C) 2025. All rights reserved.");
-            finalFeed.Description = new TextSyndicationContent("Mark Feed");
-            finalFeed.Generator = "Mark Harrison Feed Generator";
-            finalFeed.LastUpdatedTime = DateTimeOffset.Now;
+            finalFeed.Title = new TextSyndicationContent("Az1News Feed");
+            finalFeed.Copyright = new TextSyndicationContent("Copyright (C) Harrison 2025. All rights reserved.");
+            finalFeed.Description = new TextSyndicationContent("Harrison Feed");
+            finalFeed.Generator = "Harrison Feed Generator";
+            finalFeed.LastUpdatedTime = DateTimeOffset.Now.ToUniversalTime();
+
+            finalFeed.Links.Clear(); // Remove any Atom links
+            finalFeed.Links.Add(SyndicationLink.CreateAlternateLink(new Uri("https://news.azure1.dev/")));
+
             finalFeed.Items = finalItems;
 
             using (var stringWriter = new System.IO.StringWriter())
@@ -70,7 +95,6 @@ namespace Azure1News.Pages
                 strFeed = stringWriter.ToString();
             }
 
-            // Cache the feed for 15 minutes
             _cache.Set(CacheKey, strFeed, TimeSpan.FromMinutes(CacheMinutes));
         }
     }
