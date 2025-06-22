@@ -69,9 +69,9 @@ namespace Azure1News.Pages
             }
 
             finalItems.Sort(CompareDates);
-            if (finalItems.Count > 30)
+            if (finalItems.Count > 40)
             {
-                finalItems = finalItems.Take(30).ToList();
+                finalItems = finalItems.Take(40).ToList();
             }
 
             SyndicationFeed finalFeed = new SyndicationFeed();
